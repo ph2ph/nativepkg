@@ -1,0 +1,10 @@
+# `$1` is the count of this package after the operation: 1 on first install, 2 on upgrade, 0 on removal.
+if [ "$1" -eq 1 ]; then
+	# `|| :` because a non-zero scriptlet aborts the whole transaction; `shadow-utils` is `Requires(pre)` anyway.
+	if ! getent group '{{ group }}' >/dev/null; then
+		groupadd --system '{{ group }}' || :
+	fi
+	if ! getent passwd '{{ user }}' >/dev/null; then
+		useradd --system --gid '{{ group }}' --no-create-home --home-dir '{{ install_dir }}/{{ package_name }}' --shell /sbin/nologin --comment '{{ package_name }} service account' '{{ user }}' || :
+	fi
+fi

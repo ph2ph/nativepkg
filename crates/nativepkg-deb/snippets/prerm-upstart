@@ -1,0 +1,8 @@
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+	# Defers to a running systemd; otherwise a host with initctl present would stop a job that never started.
+	if [ -d /run/systemd/system ]; then
+		: # systemd is running; the Upstart job is inert.
+	elif command -v initctl >/dev/null 2>&1; then
+		initctl stop '{{ package_name }}' >/dev/null || true
+	fi
+fi

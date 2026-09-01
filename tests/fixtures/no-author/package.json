@@ -1,0 +1,9 @@
+{
+  "name": "no-author",
+  "version": "1.0.0",
+  "description": "a manifest with no author, which the bash tool turned into `Maintainer: null`",
+  "private": true,
+  "nativepkg": {
+    "init": "none"
+  }
+}

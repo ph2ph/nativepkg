@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Static musl binaries, one per Linux architecture. This is what a distribution package or the
+  # npm launcher wraps: one binary runs on any distribution regardless of its glibc.
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+          - target: aarch64-unknown-linux-musl
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends musl-tools gcc-aarch64-linux-gnu file
+      - run: rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      # The musl linker is scoped to the target; host build scripts keep the host linker.
+      - env:
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: musl-gcc
+          CC_x86_64_unknown_linux_musl: musl-gcc
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
+          CC_aarch64_unknown_linux_musl: aarch64-linux-gnu-gcc
+        run: |
+          set -e
+          cargo build --release -p nativepkg-cli --target ${{ matrix.target }}
+          file "target/${{ matrix.target }}/release/nativepkg" | tee /dev/stderr | grep -q static
+          mkdir -p dist
+          cp "target/${{ matrix.target }}/release/nativepkg" "dist/nativepkg-${{ matrix.target }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nativepkg-${{ matrix.target }}
+          path: dist/nativepkg-${{ matrix.target }}
+
+  # Native macOS binaries, so the darwin platform packages the npm launcher lists are real rather
+  # than promised. Both architectures build on the arm64 runner: aarch64 natively, x86_64 through
+  # the Apple toolchain's built-in cross target. liblzma is compiled in (the `static` feature), so
+  # the binary depends on no Homebrew dylib and runs on a stock Mac.
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          set -e
+          cargo build --release -p nativepkg-cli --target ${{ matrix.target }}
+          file "target/${{ matrix.target }}/release/nativepkg" | tee /dev/stderr | grep -q Mach-O
+          mkdir -p dist
+          cp "target/${{ matrix.target }}/release/nativepkg" "dist/nativepkg-${{ matrix.target }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nativepkg-${{ matrix.target }}
+          path: dist/nativepkg-${{ matrix.target }}

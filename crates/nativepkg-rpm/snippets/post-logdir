@@ -1,0 +1,2 @@
+# `|| :` because a non-zero scriptlet aborts the whole transaction; a missing account must not.
+install -d -m 0755 -o '{{ user }}' -g '{{ group }}' '/var/log/{{ package_name }}' || :

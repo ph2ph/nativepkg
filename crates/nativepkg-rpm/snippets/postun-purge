@@ -1,0 +1,9 @@
+# RPM has no `purge` distinct from removal, so the account is removed on the final erase.
+if [ "$1" -eq 0 ]; then
+	if getent passwd '{{ user }}' >/dev/null; then
+		userdel '{{ user }}' >/dev/null 2>&1 || :
+	fi
+	if getent group '{{ group }}' >/dev/null; then
+		groupdel '{{ group }}' >/dev/null 2>&1 || :
+	fi
+fi

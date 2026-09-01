@@ -1,0 +1,5 @@
+if [ "$1" = "purge" ]; then
+	if command -v update-rc.d >/dev/null 2>&1; then
+		update-rc.d {{ package_name }} remove >/dev/null || true
+	fi
+fi

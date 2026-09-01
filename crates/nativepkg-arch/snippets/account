@@ -1,0 +1,7 @@
+	# `|| true` because a scriptlet that aborts leaves the package half-configured with no usable message.
+	if ! getent group '{{ group }}' >/dev/null; then
+		groupadd --system '{{ group }}' || true
+	fi
+	if ! getent passwd '{{ user }}' >/dev/null; then
+		useradd --system --gid '{{ group }}' --no-create-home --home-dir '{{ install_dir }}/{{ package_name }}' --shell /usr/bin/nologin --comment '{{ package_name }} service account' '{{ user }}' || true
+	fi

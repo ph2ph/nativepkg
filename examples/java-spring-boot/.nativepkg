@@ -1,0 +1,18 @@
+{
+  "package_name": "orders-service",
+  "version": "3.0.0",
+  "description": "Spring Boot orders service.",
+  "maintainer": "You <you@example.com>",
+  "homepage": "https://example.com/orders-service",
+  "license": "MIT",
+  "dependencies": "openjdk-17-jre-headless",
+  "install_dir": "/opt",
+  "user": "orders",
+  "group": "orders",
+  "executable_name": "orders-service",
+  "init": "systemd",
+  "install_strategy": "copy",
+  "entrypoints": {
+    "daemon": "run.sh"
+  }
+}

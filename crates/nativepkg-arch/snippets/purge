@@ -1,0 +1,6 @@
+	if getent passwd '{{ user }}' >/dev/null; then
+		userdel '{{ user }}' >/dev/null 2>&1 || true
+	fi
+	if getent group '{{ group }}' >/dev/null; then
+		groupdel '{{ group }}' >/dev/null 2>&1 || true
+	fi

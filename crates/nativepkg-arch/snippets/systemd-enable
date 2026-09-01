@@ -1,0 +1,2 @@
+	# `preset`, not `enable`: Arch leaves enabling to the user's or distribution's systemd.preset.
+	systemctl preset '{{ package_name }}.service' >/dev/null 2>&1 || true

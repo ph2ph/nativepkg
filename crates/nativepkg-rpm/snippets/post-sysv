@@ -1,0 +1,8 @@
+if [ "$1" -eq 1 ]; then
+	if command -v chkconfig >/dev/null 2>&1; then
+		chkconfig --add '{{ package_name }}' >/dev/null 2>&1 || :
+	fi
+	if command -v service >/dev/null 2>&1; then
+		service '{{ package_name }}' start >/dev/null 2>&1 || :
+	fi
+fi

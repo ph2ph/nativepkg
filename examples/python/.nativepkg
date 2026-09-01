@@ -1,0 +1,18 @@
+{
+  "package_name": "weather-api",
+  "version": "2.1.0",
+  "description": "A small weather HTTP API.",
+  "maintainer": "You <you@example.com>",
+  "homepage": "https://example.com/weather-api",
+  "license": "Apache-2.0",
+  "dependencies": "python3, python3-flask",
+  "install_dir": "/opt",
+  "user": "weather",
+  "group": "weather",
+  "executable_name": "weather-api",
+  "init": "systemd",
+  "install_strategy": "copy",
+  "entrypoints": {
+    "daemon": "app.py"
+  }
+}

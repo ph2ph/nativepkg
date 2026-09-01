@@ -1,0 +1,9 @@
+{
+  "package_name": "simple",
+  "version": "0.1.0",
+  "description": "foo",
+  "maintainer": "foo <bar@baz.quux>",
+  "entrypoints": {
+    "daemon": "app.js"
+  }
+}

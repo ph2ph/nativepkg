@@ -1,0 +1,7 @@
+# Single source of truth for the compiler. Pinned to a literal version rather than
+# `stable` so that contributors and CI resolve the same compiler: rustup reads this file,
+# so the GitHub Actions workflow needs no separate version pin.
+[toolchain]
+channel = "1.95"
+components = ["clippy", "rustfmt"]
+profile = "minimal"

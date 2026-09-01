@@ -1,0 +1,16 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ]; then
+	# Guarded on systemd running, not on systemctl existing: containers have the binary without the daemon.
+	if [ -d /run/systemd/system ]; then
+		systemctl --system daemon-reload >/dev/null || true
+
+		# A non-empty "$2" is the previously installed version, so this is an upgrade: only a restart picks up the new files.
+		if [ -n "$2" ]; then
+			_nativepkg_action=restart
+		else
+			_nativepkg_action=start
+		fi
+
+		# deb-systemd-invoke honours policy-rc.d, which is how build chroots and images forbid service starts.
+		deb-systemd-invoke "$_nativepkg_action" '{{ package_name }}.service' >/dev/null || true
+	fi
+fi

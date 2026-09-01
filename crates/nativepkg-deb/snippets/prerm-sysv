@@ -1,0 +1,9 @@
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+	if [ -d /run/systemd/system ]; then
+		: # systemd is running; the System V script is inert.
+	elif command -v invoke-rc.d >/dev/null 2>&1; then
+		invoke-rc.d {{ package_name }} stop >/dev/null || true
+	elif [ -x '/etc/init.d/{{ package_name }}' ]; then
+		'/etc/init.d/{{ package_name }}' stop >/dev/null || true
+	fi
+fi

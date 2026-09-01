@@ -1,0 +1,8 @@
+if [ "$1" = "configure" ]; then
+	if [ -d /run/systemd/system ]; then
+		: # systemd is running; the Upstart job is inert.
+	elif command -v initctl >/dev/null 2>&1; then
+		initctl reload-configuration >/dev/null || true
+		initctl start '{{ package_name }}' >/dev/null || true
+	fi
+fi

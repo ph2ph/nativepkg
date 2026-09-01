@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+# rustup reads rust-toolchain.toml, so every job resolves the same pinned compiler
+# and its clippy/rustfmt components with no version pin here.
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install 1.88 --profile minimal
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo +1.88 check --workspace --all-targets
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --workspace --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nativepkg
+          path: target/release/nativepkg
+
+  # Error-level lintian tags fail the pipeline: a package that trips them is not fit to ship.
+  policy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: nativepkg, path: bin }
+      - run: chmod +x bin/nativepkg
+      - name: lintian on a real .deb
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w debian:trixie-slim bash -c '
+            set -e
+            apt-get update >/dev/null && apt-get install -y --no-install-recommends lintian dpkg-dev adduser >/dev/null
+            cd tests/fixtures/simple
+            /w/bin/nativepkg --format deb --nodejs --output-dir /tmp/out \
+              --maintainer "CI <ci@example.invalid>" \
+              --description "A probe application used to exercise the packaging pipeline." \
+              package.json app.js lib
+            lintian --fail-on error --tag-display-limit 0 /tmp/out/*.deb
+          '
+
+  # Two builds of one input, timestamp from the commit, must be byte-identical.
+  reproducible:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/download-artifact@v4
+        with: { name: nativepkg, path: bin }
+      - run: chmod +x bin/nativepkg
+      - run: |
+          set -e
+          BIN="$PWD/bin/nativepkg"
+          export SOURCE_DATE_EPOCH="$(git log -1 --pretty=%ct)"
+          cd tests/fixtures/simple
+          "$BIN" --quiet --format deb,rpm,arch --nodejs --output-dir /tmp/a --maintainer "CI <ci@example.invalid>" package.json app.js lib
+          "$BIN" --quiet --format deb,rpm,arch --nodejs --output-dir /tmp/b --maintainer "CI <ci@example.invalid>" package.json app.js lib
+          diff -r /tmp/a /tmp/b
+
+  # Install and run the packaged service on each distribution family, as that distribution.
+  scenarios:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { distro: debian-trixie, image: debian:trixie-slim, format: deb }
+          - { distro: ubuntu-noble, image: ubuntu:noble, format: deb }
+          - { distro: fedora, image: fedora:41, format: rpm }
+          - { distro: archlinux, image: archlinux:base, format: arch }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: nativepkg, path: bin }
+      - run: chmod +x bin/nativepkg
+      - name: install + service on ${{ matrix.distro }}
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w -e FORMAT="${{ matrix.format }}" "${{ matrix.image }}" bash -c '
+            set -e
+            if command -v apt-get >/dev/null; then apt-get update >/dev/null && apt-get install -y --no-install-recommends nodejs adduser init-system-helpers >/dev/null
+            elif command -v dnf >/dev/null; then dnf install -y --setopt=install_weak_deps=False nodejs shadow-utils systemd util-linux >/dev/null
+            elif command -v pacman >/dev/null; then pacman -Sy --noconfirm --needed nodejs shadow systemd >/dev/null; fi
+            cd tests/fixtures/simple
+            /w/bin/nativepkg --quiet --format "$FORMAT" --nodejs --output-dir /tmp/out --maintainer "CI <ci@example.invalid>" --description "A probe application used to exercise the packaging pipeline." package.json app.js lib
+            bash /w/ci/scenarios.sh "/tmp/out/$(ls /tmp/out | head -1)" simple
+            cd ../hello-svc
+            /w/bin/nativepkg --quiet --format "$FORMAT" --nodejs --output-dir /tmp/hello --install-dir /opt/test --daemon index.js --exec-name hello --init systemd --user hello --group hello --description "Writes a greeting to its log every second." index.js package.json
+            bash /w/ci/service-runs.sh "/tmp/hello/$(ls /tmp/hello | head -1)" hello-svc /opt/test
+          '
+
+  # The declared runtime dependencies must be load-bearing: without adduser the install fails
+  # for that reason, rather than succeeding and skipping the service account.
+  declares-what-it-needs:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: nativepkg, path: bin }
+      - run: chmod +x bin/nativepkg
+      - run: |
+          docker run --rm -v "$PWD:/w" -w /w debian:trixie-slim bash -c '
+            set -e
+            cd tests/fixtures/simple
+            /w/bin/nativepkg --quiet --format deb --output-dir /tmp/bare --maintainer "CI <ci@example.invalid>" --description "A probe application." package.json app.js lib
+            if dpkg --install /tmp/bare/*.deb; then echo "installed without adduser: dependency not declared"; exit 1; fi
+            dpkg --remove --force-remove-reinstreq simple || true
+            dpkg --info /tmp/bare/*.deb | grep -q "Depends:.*adduser" || { echo "adduser not declared"; exit 1; }
+            echo "install failed because a declared dependency was absent, which is correct"
+          '
+
+  # Upgrade is where the worst maintainer-script defects hide; deb only, since it speaks dpkg.
+  upgrade:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [debian:trixie-slim, ubuntu:noble]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: nativepkg, path: bin }
+      - run: chmod +x bin/nativepkg
+      - run: |
+          docker run --rm -v "$PWD:/w" -w /w "${{ matrix.image }}" bash -c '
+            set -e
+            apt-get update >/dev/null && apt-get install -y --no-install-recommends nodejs adduser init-system-helpers >/dev/null
+            cd tests/fixtures/simple
+            /w/bin/nativepkg --quiet --format deb --nodejs --output-dir /tmp/up --maintainer "CI <ci@example.invalid>" --description "A probe application." package.json app.js lib
+            /w/bin/nativepkg --quiet --format deb --nodejs --output-dir /tmp/up --version 0.2.0 --maintainer "CI <ci@example.invalid>" --description "A probe application." package.json app.js lib
+            bash /w/ci/upgrade.sh /tmp/up/simple_0.1.0_all.deb /tmp/up/simple_0.2.0_all.deb simple
+          '
+
+# The full systemd enable/start lifecycle needs a booted systemd as PID 1, which GitHub-hosted
+# runners cannot provide. Run ci/systemd-lifecycle.sh on a self-hosted privileged runner if you
+# want it; the scenarios job above covers install, service execution and removal on hosted ones.

@@ -1,0 +1,11 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ]; then
+	# Removes only masks this package's own removal created.
+	deb-systemd-helper unmask '{{ package_name }}.service' >/dev/null || true
+
+	# First install enables the unit; an upgrade only refreshes symlinks, so an administrator's disable survives.
+	if deb-systemd-helper --quiet was-enabled '{{ package_name }}.service'; then
+		deb-systemd-helper enable '{{ package_name }}.service' >/dev/null || true
+	else
+		deb-systemd-helper update-state '{{ package_name }}.service' >/dev/null || true
+	fi
+fi

@@ -1,0 +1,8 @@
+# `%systemd_post` written out (rpmbuild is not involved, so no macro expands), plus a reload and a start.
+systemctl daemon-reload >/dev/null 2>&1 || :
+if [ "$1" -eq 1 ]; then
+	# `preset`, not `enable`: honours the distribution's presets and an administrator's earlier decision.
+	systemctl preset '{{ package_name }}.service' >/dev/null 2>&1 || :
+	# Not in the macro: without it a first install on Fedora left the unit enabled but dead until reboot.
+	systemctl start '{{ package_name }}.service' >/dev/null 2>&1 || :
+fi

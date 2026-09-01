@@ -1,0 +1,4 @@
+	# In `app/`, where the manifest is. Runs as root, so never runs install hooks.
+	if command -v {{ install_binary }} >/dev/null 2>&1; then
+		( cd '{{ install_dir }}/{{ package_name }}/app' && {{ install_command }} ) || true
+	fi

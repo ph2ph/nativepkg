@@ -1,0 +1,11 @@
+if [ "$1" = "purge" ]; then
+	rm -rf '/var/log/{{ package_name }}'
+	rm -rf '/etc/{{ package_name }}'
+
+	if getent passwd '{{ user }}' >/dev/null; then
+		deluser --system --quiet '{{ user }}' >/dev/null || true
+	fi
+	if getent group '{{ group }}' >/dev/null; then
+		delgroup --system --quiet --only-if-empty '{{ group }}' >/dev/null || true
+	fi
+fi

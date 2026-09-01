@@ -1,0 +1,2 @@
+	# `start`, not `try-restart`: try-restart does nothing when the unit is not running, and on a first install it never is.
+	systemctl start '{{ package_name }}.service' >/dev/null 2>&1 || true

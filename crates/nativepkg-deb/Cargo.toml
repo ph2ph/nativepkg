@@ -1,0 +1,25 @@
+[package]
+name = "nativepkg-deb"
+description = "Debian package backend for nativepkg"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+nativepkg-core.workspace = true
+ar.workspace = true
+tar.workspace = true
+flate2.workspace = true
+zstd.workspace = true
+liblzma.workspace = true
+md-5.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+md-5.workspace = true
+
+[lints]
+workspace = true

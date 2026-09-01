@@ -1,0 +1,6 @@
+# Stops on removal only: an upgrade leaves the service running and postinst restarts it.
+if [ "$1" = "remove" ]; then
+	if [ -d /run/systemd/system ]; then
+		deb-systemd-invoke stop '{{ package_name }}.service' >/dev/null || true
+	fi
+fi

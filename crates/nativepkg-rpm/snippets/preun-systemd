@@ -1,0 +1,5 @@
+# `%systemd_preun`: only on the last removal, not the intermediate erase of an upgrade.
+if [ "$1" -eq 0 ]; then
+	systemctl --no-reload disable '{{ package_name }}.service' >/dev/null 2>&1 || :
+	systemctl stop '{{ package_name }}.service' >/dev/null 2>&1 || :
+fi

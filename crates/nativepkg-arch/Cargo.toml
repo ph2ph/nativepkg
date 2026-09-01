@@ -1,0 +1,24 @@
+[package]
+name = "nativepkg-arch"
+description = "Arch Linux package backend for nativepkg"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+nativepkg-core.workspace = true
+tar.workspace = true
+zstd.workspace = true
+flate2.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+sha2.workspace = true
+flate2.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,7 @@
+{
+  "package_name": "hello-svc",
+  "version": "1.0.0",
+  "description": "Writes a greeting to its log every second",
+  "maintainer": "Ivan Smirnov <memorandumpromo@gmail.com>",
+  "license": "MIT"
+}

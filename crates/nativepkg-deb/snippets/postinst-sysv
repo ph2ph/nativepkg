@@ -1,0 +1,17 @@
+if [ "$1" = "configure" ]; then
+	# Defers to a running systemd; otherwise two independently supervised copies of the process could start.
+	if [ -d /run/systemd/system ]; then
+		: # systemd is running; the System V script is inert.
+	else
+		# Name deliberately unquoted: lintian's update-rc.d registration check does not see a quoted name.
+		# It is a validated Debian package name, so it cannot contain a shell metacharacter.
+		if command -v update-rc.d >/dev/null 2>&1; then
+			update-rc.d {{ package_name }} defaults >/dev/null || true
+		fi
+		if command -v invoke-rc.d >/dev/null 2>&1; then
+			invoke-rc.d {{ package_name }} start >/dev/null || true
+		elif [ -x '/etc/init.d/{{ package_name }}' ]; then
+			'/etc/init.d/{{ package_name }}' start >/dev/null || true
+		fi
+	fi
+fi

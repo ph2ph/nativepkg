@@ -1,0 +1,22 @@
+[package]
+name = "nativepkg-core"
+description = "Format-agnostic build plan for nativepkg"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+walkdir.workspace = true
+
+[dev-dependencies]
+debversion.workspace = true
+
+[lints]
+workspace = true

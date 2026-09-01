@@ -1,0 +1,19 @@
+{
+  "package_name": "hello-svc",
+  "version": "1.0.0",
+  "description": "Greets the log once a second.",
+  "maintainer": "John Doe <johndoe@example.com>",
+  "homepage": "https://example.com/hello-svc",
+  "license": "MIT",
+  "dependencies": "nodejs, redis-server",
+  "install_dir": "/opt",
+  "user": "hello",
+  "group": "hello",
+  "executable_name": "hello",
+  "init": "systemd",
+  "install_strategy": "copy",
+  "entrypoints": {
+    "daemon": "index.js",
+    "cli": "cli.js"
+  }
+}

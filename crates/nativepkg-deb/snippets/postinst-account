@@ -1,0 +1,11 @@
+if [ "$1" = "configure" ]; then
+	# Debian Policy 9.2.2: service accounts are created with adduser --system.
+	if ! getent group '{{ group }}' >/dev/null; then
+		addgroup --system '{{ group }}' >/dev/null
+	fi
+	if ! getent passwd '{{ user }}' >/dev/null; then
+		# One line, --home double-quoted: lintian's adduser check follows neither a continuation nor a single-quoted path.
+		_nativepkg_home='{{ install_dir }}/{{ package_name }}'
+		adduser --system --ingroup '{{ group }}' --no-create-home --home "$_nativepkg_home" --shell /usr/sbin/nologin --gecos '{{ package_name }} service account' '{{ user }}' >/dev/null
+	fi
+fi

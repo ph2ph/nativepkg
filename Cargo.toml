@@ -1,0 +1,67 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/nativepkg-core",
+    "crates/nativepkg-deb",
+    "crates/nativepkg-rpm",
+    "crates/nativepkg-arch",
+    "crates/nativepkg-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+# 1.88 because `rpm` >= 0.19 needs it, and 0.19 is where the crate stopped buffering file
+# contents in memory. The `msrv` CI job is what enforces this line.
+rust-version = "1.88"
+license = "MIT"
+repository = "https://github.com/ph2ph/nativepkg"
+authors = ["Ivan Smirnov"]
+
+[workspace.dependencies]
+nativepkg-core = { path = "crates/nativepkg-core", version = "0.1.0" }
+nativepkg-deb = { path = "crates/nativepkg-deb", version = "0.1.0" }
+nativepkg-rpm = { path = "crates/nativepkg-rpm", version = "0.1.0" }
+nativepkg-arch = { path = "crates/nativepkg-arch", version = "0.1.0" }
+
+anyhow = "1.0"
+clap = { version = "4.6", features = ["derive"] }
+semver = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+walkdir = "2.5"
+ar = "0.9"
+tar = "0.4"
+flate2 = "1.1"
+zstd = "0.13"
+# `static` compiles the bundled xz and links it in, so the binary carries no liblzma of its own
+# — self-contained on every target, and the only way a macOS build avoids a Homebrew dylib.
+liblzma = { version = "0.4", features = ["static"] }
+md-5 = "0.11"
+sha2 = "0.11"
+
+# Default features bring an OpenPGP stack for signing (476 crates vs 95). Not a goal.
+rpm = { version = "0.27", default-features = false, features = [
+    "payload",
+    "gzip-compression",
+    "zstd-compression",
+    "xz-compression",
+] }
+rpm-version = "0.5"
+
+# Test oracle for Debian version ordering (policy 5.6.12). Too heavy to ship: 31 crates.
+debversion = "0.5"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# Generic "# Errors"/"# Panics" sections are boilerplate; the useful ones stay by hand.
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[profile.release]
+lto = "thin"
+strip = true

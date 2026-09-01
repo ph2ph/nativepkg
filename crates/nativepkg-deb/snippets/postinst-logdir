@@ -1,0 +1,11 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ]; then
+	# Under systemd the directory comes from the package's tmpfiles.d fragment; elsewhere it is made here.
+	# No recursive chown (lintian recursive-privilege-change): ownership is set on exactly one path.
+	if [ -d /run/systemd/system ] && [ -f '/usr/lib/tmpfiles.d/{{ package_name }}.conf' ]; then
+		systemd-tmpfiles --create '/usr/lib/tmpfiles.d/{{ package_name }}.conf' >/dev/null || true
+	else
+		mkdir -p '/var/log/{{ package_name }}'
+		chown '{{ user }}:{{ group }}' '/var/log/{{ package_name }}'
+		chmod 0755 '/var/log/{{ package_name }}'
+	fi
+fi
