@@ -213,10 +213,10 @@ fn a_template_can_be_printed_and_an_unknown_one_names_the_alternatives() {
 
 #[test]
 fn introspection_is_recognised_as_such() {
-    assert!(parse(&["--list-templates"]).is_introspection());
-    assert!(parse(&["--list-template-variables"]).is_introspection());
+    assert!(parse(&["--list-tmps"]).is_introspection());
+    assert!(parse(&["--list-tmp-vars"]).is_introspection());
     assert!(parse(&["--list-json-overrides"]).is_introspection());
-    assert!(parse(&["--cat-template", "default"]).is_introspection());
+    assert!(parse(&["--cat-tmp", "default"]).is_introspection());
     assert!(!parse(&["--pkg-name", "app"]).is_introspection());
 }
 

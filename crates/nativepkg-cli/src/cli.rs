@@ -151,7 +151,7 @@ pub struct Cli {
     pub daemon_entrypoint: Option<String>,
 
     /// The file the command-line wrapper runs; defaults to the daemon entry point.
-    #[arg(long, value_name = "FILE")]
+    #[arg(long = "cli", value_name = "FILE")]
     pub cli_entrypoint: Option<String>,
 
     // -- service ---------------------------------------------------------------------------
@@ -212,15 +212,15 @@ pub struct Cli {
     pub list_json_overrides: bool,
 
     /// List the available templates.
-    #[arg(long, action = ArgAction::SetTrue)]
+    #[arg(long = "list-tmps", action = ArgAction::SetTrue)]
     pub list_templates: bool,
 
     /// List the variables templates may use.
-    #[arg(long, action = ArgAction::SetTrue)]
+    #[arg(long = "list-tmp-vars", action = ArgAction::SetTrue)]
     pub list_template_variables: bool,
 
     /// Print one template by name.
-    #[arg(long, value_name = "NAME")]
+    #[arg(long = "cat-tmp", value_name = "NAME")]
     pub cat_template: Option<String>,
 
     /// Print this tool's README.

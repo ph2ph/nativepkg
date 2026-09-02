@@ -114,7 +114,7 @@ fn metadata_can_come_entirely_from_flags_with_no_manifest_at_all() {
         "F <f@example.com>",
         "--init",
         "none",
-        "--cli-entrypoint",
+        "--cli",
         "tool.sh",
         "tool.sh",
     ]);

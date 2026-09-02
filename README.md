@@ -159,7 +159,7 @@ option falls back to when neither the flag nor the config key is set.
 | Flag | Config key | Default | Description |
 |---|---|---|---|
 | `--daemon` | `entrypoints.daemon` | — | File the service runs (e.g. `index.js`) |
-| `--cli-entrypoint` | `entrypoints.cli` | daemon entry point | File the `/usr/bin` wrapper runs |
+| `--cli` | `entrypoints.cli` | daemon entry point | File the `/usr/bin` wrapper runs |
 | `-e, --exec-name` | `executable_name` | package name | Name of the command placed on `PATH` |
 | `--install-dir` | `install_dir` | `/usr/lib/<name>` | Directory the app is installed into |
 | `--extra-files` | `extra_files` | none | Extra files copied verbatim to the filesystem root |
@@ -194,7 +194,7 @@ option falls back to when neither the flag nor the config key is set.
 
 ### Templates
 
-Replace a generated file with your own; `nativepkg --list-templates` names them.
+Replace a generated file with your own; `nativepkg --list-tmps` names them.
 The config equivalents live under a `templates` object (e.g.
 `"templates": { "systemd_service": "my-unit.service" }`).
 
@@ -215,7 +215,7 @@ The config equivalents live under a `templates` object (e.g.
 | `--verbose` / `--quiet` | More output / errors only |
 | `--tool-version` | Print nativepkg's own version |
 | `--list-json-overrides` | List every config key |
-| `--list-templates`, `--list-template-variables`, `--cat-template <name>` | Inspect the built-in templates and the variables they use |
+| `--list-tmps`, `--list-tmp-vars`, `--cat-tmp <name>` | Inspect the built-in templates and the variables they use |
 | `--show-readme`, `--show-changelog` | Print this document, or the changelog |
 
 ## Bundling node_modules

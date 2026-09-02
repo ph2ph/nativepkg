@@ -23,7 +23,7 @@ pub struct Variables {
     values: BTreeMap<String, String>,
 }
 
-/// Every variable [`Variables::for_config`] defines; what `--list-template-variables` prints.
+/// Every variable [`Variables::for_config`] defines; what `--list-tmp-vars` prints.
 /// A test asserts it equals what `for_config` actually populates, so the two cannot drift.
 const CANONICAL: &[&str] = &[
     "package_name",

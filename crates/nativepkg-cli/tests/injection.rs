@@ -176,7 +176,7 @@ fn shell_metacharacters_in_a_description_are_quoted_in_the_init_script() {
 #[test]
 fn an_entrypoint_with_a_shell_metacharacter_is_refused() {
     let project = Project::new("entrypoint", PLAIN);
-    let (ok, stderr, _) = project.build("deb", &["--cli-entrypoint", "index.js; touch /tmp/PWNED"]);
+    let (ok, stderr, _) = project.build("deb", &["--cli", "index.js; touch /tmp/PWNED"]);
     assert!(!ok, "must not build");
     assert!(stderr.contains("entrypoint"), "{stderr}");
 }
