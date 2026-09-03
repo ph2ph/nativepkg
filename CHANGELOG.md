@@ -7,6 +7,7 @@ configured by a `.nativepkg` file or command-line flags, with no host packaging
 toolchain (`dpkg-deb`, `rpmbuild`, `makepkg` or `fakeroot`) required.
 
 ### Added
+- Published on crates.io as a single crate: `cargo install nativepkg`.
 - `.rpm` and `.pkg.tar.zst` output alongside `.deb`; `--format` selects any
   combination.
 - Byte-reproducible builds, from `SOURCE_DATE_EPOCH`, the git commit time or the

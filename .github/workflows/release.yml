@@ -89,3 +89,18 @@ jobs:
           --title "$GITHUB_REF_NAME"
           --generate-notes
           dist/nativepkg-*
+
+  # crates.io: one crate, one `cargo publish`. Gated behind the `crates-io` environment (give it
+  # required reviewers) so a tag cannot publish by accident; CARGO_REGISTRY_TOKEN is that
+  # environment's secret. Once the crate exists, crates.io Trusted Publishing (OIDC) can replace
+  # the token. Runs only after every binary built, so a broken release is never published.
+  crates-io:
+    needs: [linux, macos]
+    runs-on: ubuntu-latest
+    environment: crates-io
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish
