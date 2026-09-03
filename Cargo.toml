@@ -66,5 +66,7 @@ missing_errors_doc = "allow"
 missing_panics_doc = "allow"
 
 [profile.release]
-lto = "thin"
+# The binary is what ships; a slower release build buys a smaller, faster one.
+lto = "fat"
+codegen-units = 1
 strip = true
