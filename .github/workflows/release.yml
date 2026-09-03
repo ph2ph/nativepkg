@@ -66,3 +66,26 @@ jobs:
         with:
           name: nativepkg-${{ matrix.target }}
           path: dist/nativepkg-${{ matrix.target }}
+
+  # Publish the four binaries as assets on the tag's GitHub Release, giving them stable download
+  # URLs. This is the link the npm packaging depends on: nativepkg-npm fetches
+  # https://github.com/<owner>/<repo>/releases/download/<tag>/nativepkg-<target>. Without it the
+  # binaries live only as ephemeral workflow artifacts, and the npm build has nothing to pull.
+  release:
+    needs: [linux, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --title "$GITHUB_REF_NAME"
+          --generate-notes
+          dist/nativepkg-*
