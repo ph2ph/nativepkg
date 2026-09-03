@@ -511,63 +511,22 @@ name = "nativepkg"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "clap",
- "nativepkg-arch",
- "nativepkg-core",
- "nativepkg-deb",
- "nativepkg-rpm",
- "rpm",
- "serde_json",
- "tar",
- "zstd",
-]
-
-[[package]]
-name = "nativepkg-arch"
-version = "0.1.0"
-dependencies = [
- "flate2",
- "nativepkg-core",
- "sha2 0.11.0",
- "tar",
- "thiserror",
- "zstd",
-]
-
-[[package]]
-name = "nativepkg-core"
-version = "0.1.0"
-dependencies = [
- "debversion",
- "semver",
- "serde",
- "serde_json",
- "thiserror",
- "walkdir",
-]
-
-[[package]]
-name = "nativepkg-deb"
-version = "0.1.0"
-dependencies = [
  "ar",
+ "clap",
+ "debversion",
  "flate2",
  "liblzma",
  "md-5",
- "nativepkg-core",
- "tar",
- "thiserror",
- "zstd",
-]
-
-[[package]]
-name = "nativepkg-rpm"
-version = "0.1.0"
-dependencies = [
- "nativepkg-core",
  "rpm",
  "rpm-version",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "tar",
  "thiserror",
+ "walkdir",
+ "zstd",
 ]
 
 [[package]]

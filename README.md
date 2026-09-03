@@ -64,7 +64,7 @@ cargo install nativepkg
 Or build from source (needs Rust 1.88 or newer):
 
 ```bash
-cargo install --path crates/nativepkg-cli
+cargo install --path .
 ```
 
 That gives you a `nativepkg` command.
@@ -255,12 +255,13 @@ single run, on any host:
 
 ```bash
 cargo build --release
-cargo test --workspace
+cargo test
 ```
 
-The workspace is five crates: a format-agnostic core that reads the config,
-resolves it, plans the file set and renders templates, plus one backend each for
-Debian, RPM and Arch that write the archives directly, and the CLI on top.
+One crate, four modules: a format-agnostic `core` that reads the config, resolves
+it, plans the file set and renders templates; one backend each — `deb`, `rpm`,
+`arch` — that writes its archive directly from that plan; and the CLI on top. The
+backends depend on the core and never on each other, and a test enforces it.
 
 ## License
 
