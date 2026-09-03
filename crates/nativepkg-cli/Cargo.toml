@@ -1,6 +1,7 @@
 [package]
-name = "nativepkg-cli"
-description = "Command line interface for nativepkg"
+name = "nativepkg"
+description = "Build .deb, .rpm and .pkg.tar.zst packages from any project, directly, in Rust"
+readme = "README.md"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

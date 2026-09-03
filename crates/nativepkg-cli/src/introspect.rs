@@ -40,10 +40,11 @@ pub fn cat_template(name: &str) -> Result<&'static str> {
 /// from next to the script).
 #[must_use]
 pub fn readme() -> &'static str {
-    include_str!("../../../README.md")
+    // Symlinks to the workspace-root files, so the published crate carries them.
+    include_str!("../README.md")
 }
 
 #[must_use]
 pub fn changelog() -> &'static str {
-    include_str!("../../../CHANGELOG.md")
+    include_str!("../CHANGELOG.md")
 }

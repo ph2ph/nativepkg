@@ -507,19 +507,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "nativepkg-arch"
-version = "0.1.0"
-dependencies = [
- "flate2",
- "nativepkg-core",
- "sha2 0.11.0",
- "tar",
- "thiserror",
- "zstd",
-]
-
-[[package]]
-name = "nativepkg-cli"
+name = "nativepkg"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -531,6 +519,18 @@ dependencies = [
  "rpm",
  "serde_json",
  "tar",
+ "zstd",
+]
+
+[[package]]
+name = "nativepkg-arch"
+version = "0.1.0"
+dependencies = [
+ "flate2",
+ "nativepkg-core",
+ "sha2 0.11.0",
+ "tar",
+ "thiserror",
  "zstd",
 ]
 

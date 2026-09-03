@@ -55,7 +55,13 @@ nativepkg is a single self-contained binary. It is written in Rust and needs no
 Node.js or npm to run; it reads a `.nativepkg` file, or takes everything from
 flags.
 
-Build it from source (needs Rust 1.88 or newer):
+Install it from crates.io:
+
+```bash
+cargo install nativepkg
+```
+
+Or build from source (needs Rust 1.88 or newer):
 
 ```bash
 cargo install --path crates/nativepkg-cli
